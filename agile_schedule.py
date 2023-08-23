@@ -75,7 +75,7 @@ def display_with_highlight(df, cheapest_periods):
     return df.style.apply(highlight_rows, axis=1)
 
 
-st.title("Andy's Calculator")
+st.title("Andy's Bad Boy Calculator")
 st.header("For Optimal Charging Hours")
 st.subheader("On Octopus Agile")
 
