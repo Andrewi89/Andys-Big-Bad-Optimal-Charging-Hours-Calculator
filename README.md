@@ -1,2 +1,4 @@
-# Andy's Big Bad Optimal Charging Hours Calculator
- Andy's Big Bad Optimal Charging Hours Calculator
+# Calculator for the best hours to charge your electric car on Octopus Agile
+
+
+ https://andys-big-bad-optimal-charging-hours-calculator.streamlit.app/
