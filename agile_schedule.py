@@ -76,7 +76,7 @@ def display_with_highlight(df, cheapest_periods):
 
 
 st.title("Andy's Calculator")
-st.header("For Optimal Charging Hours Calculator")
+st.header("For Optimal Charging Hours")
 st.subheader("On Octopus Agile")
 
 battery_kWh = st.number_input('Enter remaining battery kWh', value=0.0)
