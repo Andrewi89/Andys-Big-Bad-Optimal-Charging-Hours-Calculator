@@ -13,7 +13,7 @@ API_KEY = "YOUR_OCTOPUS_AGILE_API_KEY"
 HEADERS = {"Authorization": f"Bearer {API_KEY}"}
 
 
-def fetch_prices(product_id="AGILE-FLEX-22-11-25", tariff_id="E-1R-AGILE-FLEX-22-11-25-A"):
+def fetch_prices(product_id="AGILE-FLEX-22-11-25", tariff_id="E-1R-AGILE-FLEX-22-11-25-B"):
     response = requests.get(OCTOPUS_API_URL.format(
         product_id=product_id, tariff_id=tariff_id), headers=HEADERS)
     if response.status_code == 200:
@@ -35,15 +35,15 @@ def mock_data():
         valid_to = valid_from + timedelta(minutes=30)
 
         # Generating mock prices.
-        # Main price range is between 0.05 to 0.20.
-        price = round(random.uniform(0.05, 0.20), 2)
+        # Main price range is between 0.05 to 0.40.
+        price = round(random.uniform(0.50, 50.00), 2)
 
         # Occasionally insert some negative prices or peaks
         if i % 10 == 0:  # Every 10th interval, we'll do something different
             if random.choice([True, False]):  # 50% chance to either spike or dip
-                price = round(random.uniform(0.20, 0.30), 2)  # Spike
+                price = round(random.uniform(20.00, 30.00), 2)  # Spike
             else:
-                price = round(random.uniform(-0.05, 0), 2)  # Dip into negative
+                price = round(random.uniform(-0.50, 0), 2)  # Dip into negative
 
         mock_prices.append({
             'value_inc_vat': price,
@@ -60,6 +60,12 @@ def select_cheapest_hours(prices_df, hours_required):
     return prices_df
 
 
+def calculate_total_cost(prices_df, charge_kWh):
+    # since each slot is half-hour, multiply by 0.5
+    total_cost = (prices_df['value_inc_vat'] / 100 * charge_kWh * 0.5).sum()
+    return total_cost
+
+
 def display_with_highlight(df, cheapest_periods):
     # Highlight the selected periods
     def highlight_rows(row):
@@ -69,12 +75,16 @@ def display_with_highlight(df, cheapest_periods):
     return df.style.apply(highlight_rows, axis=1)
 
 
-st.title("Andy's Big Bad Optimal Charging Hours Calculator")
+st.title("Andy's Calculator")
+st.header("For Optimal Charging Hours Calculator")
+st.subheader("On Octopus Agile")
 
 remaining_kWh = st.number_input('Enter remaining battery kWh', value=0.0)
 charger_kW = st.number_input('Enter size of charger in kW', value=7.0)
 charge_time = remaining_kWh / charger_kW
-st.write(f"Estimated charging time: {charge_time:.2f} hours")
+st.metric("Estimated charging time:", f"{charge_time:.2f} hours",
+          delta=None, delta_color="normal", help=None, label_visibility="visible")
+# st.write(f"Estimated charging time: {charge_time:.2f} hours")
 
 use_mock_data = st.checkbox('Use Mock Data')
 
@@ -86,6 +96,10 @@ if st.button('Calculate Optimal Charging Time'):
 
     if prices_df is not None:
         cheapest_periods = select_cheapest_hours(prices_df, charge_time)
+
+        total_cost = calculate_total_cost(cheapest_periods, remaining_kWh)
+        st.metric("Estimated charging cost:", f"£{total_cost:.2f}",
+                  delta=None, delta_color="normal", help=None, label_visibility="visible")
 
         # Display all time slots and highlight the optimal charging times
         st.dataframe(display_with_highlight(
