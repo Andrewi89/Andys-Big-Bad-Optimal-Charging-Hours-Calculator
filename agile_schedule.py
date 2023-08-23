@@ -79,11 +79,19 @@ st.title("Andy's Calculator")
 st.header("For Optimal Charging Hours Calculator")
 st.subheader("On Octopus Agile")
 
-remaining_kWh = st.number_input('Enter remaining battery kWh', value=0.0)
+battery_kWh = st.number_input('Enter remaining battery kWh', value=0.0)
 charger_kW = st.number_input('Enter size of charger in kW', value=7.0)
+solar_kWh = st.number_input('Enter daily solar generation in kWh', value=0.0)
+
+col1, col2, col3 = st.columns(3)
+
+remaining_kWh = battery_kWh - solar_kWh
+col1.metric("Remaining Grid kWh:", f"{remaining_kWh:.2f} kWh",
+            delta=None, delta_color="normal", help=None, label_visibility="visible")
+
 charge_time = remaining_kWh / charger_kW
-st.metric("Estimated charging time:", f"{charge_time:.2f} hours",
-          delta=None, delta_color="normal", help=None, label_visibility="visible")
+col2.metric("Estimated charging time:", f"{charge_time:.2f} hours",
+            delta=None, delta_color="normal", help=None, label_visibility="visible")
 # st.write(f"Estimated charging time: {charge_time:.2f} hours")
 
 use_mock_data = st.checkbox('Use Mock Data')
@@ -98,8 +106,8 @@ if st.button('Calculate Optimal Charging Time'):
         cheapest_periods = select_cheapest_hours(prices_df, charge_time)
 
         total_cost = calculate_total_cost(cheapest_periods, remaining_kWh)
-        st.metric("Estimated charging cost:", f"£{total_cost:.2f}",
-                  delta=None, delta_color="normal", help=None, label_visibility="visible")
+        col3.metric("Estimated charging cost:", f"£{total_cost:.2f}",
+                    delta=None, delta_color="normal", help=None, label_visibility="visible")
 
         # Display all time slots and highlight the optimal charging times
         st.dataframe(display_with_highlight(
