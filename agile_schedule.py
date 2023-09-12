@@ -79,8 +79,8 @@ st.title("Andy's Beta Calculator")
 st.header("For Optimal Charging Hours")
 st.subheader("On Octopus Agile")
 
-battery_kWh = st.number_input('Enter remaining battery kWh', value=0.0)
-charger_kW = st.number_input('Enter size of charger in kW', value=7.0)
+battery_kWh = st.number_input('Enter remaining storage/battery/tank kWh', value=11.0)
+charger_kW = st.number_input('Enter size of charger/diverter in kW', value=3.68)
 solar_kWh = st.number_input('Enter daily solar generation in kWh', value=0.0)
 
 col1, col2, col3 = st.columns(3)
